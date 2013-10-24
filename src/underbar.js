@@ -175,15 +175,7 @@ var _ = { };
       }
       return typeof iterator === "undefined" ? item : iterator(item);
     }, true);
-    if (typeof result === "number"){
-      if (result === 1){
-        return true;
-      } else {
-        return false;
-      }
-    } else{
-      return result;
-    }
+    return result == true;
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
@@ -191,14 +183,10 @@ var _ = { };
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
     iterator = iterator || function(x){ return x; }
-    if (_.every(collection, function(x){
+    return !_.every(collection, function(x){
       return !iterator(x);
-    })){
-      return false;
-    } else {
-      return true;
-    }
-  };
+    })
+  }
 
 
   /**
@@ -219,12 +207,28 @@ var _ = { };
   //   }, {
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
-  _.extend = function(obj) {
+  _.extend = function() {
+    var result = {};
+    _.each(arguments, function(x){
+      for(var prop in x){
+        result[prop] = x[prop];
+      }
+    })
+    return result;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    var args = Array.prototype.slice.call(arguments, 1, arguments.length);
+    _.each(args, function(x){
+      for(var prop in x){
+        if(typeof obj[prop] === "undefined"){
+          obj[prop] = x[prop];
+        }
+      }
+    })
+    return obj;
   };
 
 
