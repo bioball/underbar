@@ -16,7 +16,7 @@ var _ = { };
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
   _.first = function(array, n) {
-    return typeof n === 'undefined' ? array[0] : array.slice(0, n)
+    return typeof n === 'undefined' ? array[0] : array.slice(0, n);
   };
 
   // Like first, but for the last elements. If n is undefined, return just the
@@ -27,7 +27,7 @@ var _ = { };
       n = size;
     }
     return typeof n === 'undefined' ? array[size - 1] : 
-                                      array.slice(size - n, size)
+                                      array.slice(size - n, size);
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -51,9 +51,8 @@ var _ = { };
     // implemented for you. Instead of using a standard `for` loop, though,
     // it uses the iteration helper `each`, which you will need to write.
     for(var i = 0; i < array.length; i++){
-      if(array[i] === target){
+      if (array[i] === target)
         return i;
-      }
     }
     return -1;
   };
@@ -269,13 +268,14 @@ var _ = { };
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
-    var results = [];
-    for (var i = 0; i < 10; i++){
-      results[i] = func(i);
+    var results = {};
+    return function(x){
+      if (results[x]){
+        return results[x];
+      }
+      results[x] = func(x);
+      return results[x];
     }
-    return function(arg){
-      return typeof results[arg] === "undefined" ? func(arg) : results[arg];
-    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -314,6 +314,14 @@ var _ = { };
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    if(typeof iterator === 'function'){
+      return collection.sort(function(a, b){
+        return iterator(a) < iterator(b) ? -1 : iterator(a) > iterator(b) ? 1 : 0;
+      });
+    }
+    return collection.sort(function(a, b){
+      return a[iterator] < b[iterator] ? -1 : a[iterator] > b[iterator] ? 1: 0;
+    })
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -322,6 +330,15 @@ var _ = { };
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    var result = [];
+    for(var i = 0; i < arguments[0].length; i++){
+      var zipped = [];
+      _.each(arguments, function(argument){
+        zipped.push(argument[i]);
+      })
+      result.push(zipped)
+    }
+    return result;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -329,16 +346,38 @@ var _ = { };
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    result = result || [];
+    _.each(nestedArray, function(x){
+      if (Array.isArray(x)){
+        _.flatten(x, result);
+      } else {
+        result.push(x);
+      }
+    })
+    return result;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
-  _.intersection = function() {
+  _.intersection = function(a, b) {
+    var result = [];
+    _.each(a, function(x){
+      if (b.indexOf(x) !== -1)
+        result.push(x);
+    })
+    return result;
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    for(var i = 1; i < arguments.length; i++){
+      _.each(arguments[i], function(x){
+        var index = array.indexOf(x);
+        if(index > -1){ array.splice(index, 1); }
+      })
+    }
+    return array;
   };
 
 
@@ -352,6 +391,14 @@ var _ = { };
   //
   // See the Underbar readme for details.
   _.throttle = function(func, wait) {
+    var initTime = new Date().getTime() - wait;
+    return function(){
+      var currentTime = new Date().getTime();
+      if (currentTime - initTime >= wait){
+        func();
+        initTime = currentTime;
+      }
+    }
   };
 
 }).call(this);
