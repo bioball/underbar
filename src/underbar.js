@@ -299,7 +299,12 @@ var _ = { };
 
   // Shuffle an array.
   _.shuffle = function(array) {
-    return array.slice(array.size-1).concat(array.slice(0,array.size-2))
+    var result = [];
+    while(array.length){
+      var rand = Math.floor((Math.random()*array.length));
+      result.push(array.splice(rand, 1)[0]);
+    }
+    return result;
   };
 
 
