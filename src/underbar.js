@@ -410,5 +410,3 @@ var _ = { };
   };
 
 }).call(this);
-
-}).call(this);
