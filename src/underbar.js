@@ -391,14 +391,22 @@ var _ = { };
   //
   // See the Underbar readme for details.
   _.throttle = function(func, wait) {
-    var initTime = new Date().getTime() - wait;
-    return function(){
+    var calledTime = new Date().getTime() - wait;
+    var result;
+    return function(args){
       var currentTime = new Date().getTime();
-      if (currentTime - initTime >= wait){
-        func();
-        initTime = currentTime;
+      var timeSinceLastInvocation = currentTime - calledTime;
+      if(timeSinceLastInvocation >= wait){
+        result = func(args);
+        calledTime = currentTime;
+      } else {
+        setTimeout(function(){ result = func(args); }, wait);
+        calledTime = currentTime + wait;
       }
-    }
+      return result;
+    };
   };
+
+}).call(this);
 
 }).call(this);
