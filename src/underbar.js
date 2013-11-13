@@ -269,13 +269,12 @@ var _ = { };
   // instead if possible.
   _.memoize = function(func) {
     var results = {};
-    return function(x){
-      if (results[x]){
-        return results[x];
+    return function(arg){
+      if (results[arg] === undefined){
+        results[arg] = func(arg);
       }
-      results[x] = func(x);
-      return results[x];
-    }
+      return results[arg];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
